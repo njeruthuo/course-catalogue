@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% comment %} {{ object_list }} {% endcomment %}
+
+<h1>Courses</h1>
+
+{% include "courses/snippets/list-display.html" with queryset=object_list %}
+{% endblock content %}

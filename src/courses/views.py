@@ -6,9 +6,16 @@ from . import services
 
 def course_list_view(request):
     queryset = services.get_publish_courses()
-    return JsonResponse({'data': [x.id for x in queryset]})
+    # return JsonResponse({'data': [x.path for x in queryset]})
 
-    # return render(request, 'courses/list.html', {})
+    queryset = services.get_publish_courses()
+    print(queryset)
+
+    context = {
+        'object_list': queryset
+    }
+
+    return render(request, 'courses/list.html', context)
 
 
 def course_detail_view(request, course_id, *args, **kwargs):
@@ -16,9 +23,14 @@ def course_detail_view(request, course_id, *args, **kwargs):
     if course_obj is None:
         raise Http404
 
-    lesson_queryset = course_obj.lesson_set.all()
-    return JsonResponse({'data': {'course': course_obj.id, 'lessons': [x.id for x in lesson_queryset]}})
-    return render(request, 'courses/detail.html', {})
+    lesson_queryset = services.get_course_lessons(course_obj)
+
+    context = {
+        'object': course_obj,
+        'lesson_queryset': lesson_queryset
+    }
+    # return JsonResponse({'data': {'course': course_obj.id, 'lessons': [x.id for x in lesson_queryset]}})
+    return render(request, 'courses/detail.html', context)
 
 
 def lesson_detail_view(request, course_id, lesson_id, *args, **kwargs):

@@ -14,7 +14,7 @@ def get_course_detail(course_id=None):
     try:
         obj = Course.objects.get(
             status=PublishStatus.PUBLISHED,
-            id=course_id
+            public_id=course_id
         )
     except:
         pass
@@ -30,13 +30,24 @@ def get_lesson_detail(lesson_id=None, course_id=None):
 
     try:
         obj = Lesson.objects.get(
-            course__id=course_id,
+            course__public_id=course_id,
             course__status=PublishStatus.PUBLISHED,
-            status=PublishStatus.PUBLISHED,
-            id=lesson_id
+            status__in=[PublishStatus.PUBLISHED, PublishStatus.COMING_SOON],
+            public_id=lesson_id
         )
     except Exception as e:
         print("lesson detail, ", e)
         pass
 
     return obj
+
+
+def get_course_lessons(course_obj):
+    lessons = Lesson.objects.none()
+    if not isinstance(course_obj, Course):
+        return lessons
+    lessons = course_obj.lesson_set.filter(
+        status__in=[PublishStatus.PUBLISHED, PublishStatus.COMING_SOON],
+        course__status=PublishStatus.PUBLISHED,
+    )
+    return lessons
